@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量子黑客系统 QHS-9000</title>
+    <style>
+        :root {
+            --neon-green: #0f0;
+            --neon-blue: #0ff;
+            --dark-bg: #000;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .terminal {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--neon-green);
+            border-radius: 5px;
+            padding: 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            background-color: rgba(0, 20, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            position: relative;
+        }
+        
+        .command-line {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .prompt {
+            color: var(--neon-blue);
+            margin-right: 10px;
+        }
+        
+        .input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-family: 'Courier New', monospace;
+            outline: none;
+        }
+        
+        .output {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .matrix-code {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--neon-green);
+            padding-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .status {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .status-item {
+            font-size: 14px;
+        }
+        
+        .status-value {
+            color: var(--neon-green);
+        }
+        
+        .glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="1" fill="%2300ff00" opacity="0.1"/></svg>');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        
+        .flicker {
+            animation: flicker 0.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="matrix-code" id="matrix-code"></div>
+        <div class="glitch"></div>
+        <div class="screen">
+            <div class="header">
+                <div class="title">量子黑客系统 QHS-9000</div>
+                <div class="status">
+                    <div class="status-item">状态: <span class="status-value" id="system-status">运行中</span></div>
+                    <div class="status-item">安全等级: <span class="status-value" id="security-level">0</span></div>
+                    <div class="status-item">连接: <span class="status-value" id="connection">已建立</span></div>
+                </div>
+            </div>
+            
+            <div class="output" id="output">
+                <div>> 初始化量子加密通道...</div>
+                <div>> 建立安全连接...</div>
+                <div>> 验证用户身份...</div>
+                <div>> 系统准备就绪</div>
+                <div>> 输入 "help" 获取命令列表</div>
+            </div>
+            
+            <div class="command-line">
+                <span class="prompt">></span>
+                <input type="text" class="input" id="input" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const systemStatus = document.getElementById('system-status');
+        const securityLevel = document.getElementById('security-level');
+        const connection = document.getElementById('connection');
+        const matrixCode = document.getElementById('matrix-code');
+        
+        // 命令列表
+        const commands = {
+            help: {
+                desc: "显示所有可用命令",
+                execute: () => {
+                    addOutput("可用命令:");
+                    for (const cmd in commands) {
+                        addOutput(`  ${cmd} - ${commands[cmd].desc}`);
+                    }
+                }
+            },
+            scan: {
+                desc: "扫描网络",
+                execute: () => {
+                    addOutput("开始网络扫描...");
+                    simulateProcess("扫描", 3, () => {
+                        const ips = [];
+                        for (let i = 0; i < 5; i++) {
+                            ips.push(`192.168.1.${Math.floor(Math.random() * 255)}`);
+                        }
+                        addOutput("发现设备:");
+                        ips.forEach(ip => addOutput(`  ${ip}`));
+                    });
+                }
+            },
+            hack: {
+                desc: "尝试入侵系统",
+                execute: () => {
+                    addOutput("初始化入侵协议...");
+                    simulateProcess("入侵", 5, () => {
+                        const success = Math.random() > 0.3;
+                        if (success) {
+                            addOutput("入侵成功! 获得系统控制权");
+                            const newLevel = Math.floor(Math.random() * 10) + 1;
+                            securityLevel.textContent = newLevel;
+                            systemStatus.textContent = "已入侵";
+                            systemStatus.classList.add('flicker');
+                        } else {
+                            addOutput("入侵失败! 目标系统已检测到攻击");
+                            connection.textContent = "已断开";
+                            setTimeout(() => {
+                                connection.textContent = "已建立";
+                            }, 2000);
+                        }
+                    });
+                }
+            },
+            clear: {
+                desc: "清除屏幕",
+                execute: () => {
+                    output.innerHTML = '';
+                }
+            },
+            status: {
+                desc: "显示系统状态",
+                execute: () => {
+                    addOutput(`系统状态: ${systemStatus.textContent}`);
+                    addOutput(`安全等级: ${securityLevel.textContent}`);
+                    addOutput(`连接状态: ${connection.textContent}`);
+                }
+            }
+        };
+        
+        // 添加输出
+        function addOutput(text) {
+            const line = document.createElement('div');
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // 模拟进程
+        function simulateProcess(name, steps, callback) {
+            let count = 0;
+            const interval = setInterval(() => {
+                count++;
+                addOutput(`${name}中... ${count}/${steps}`);
+                
+                if (count >= steps) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 800);
+        }
+        
+        // 输入处理
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = input.value.trim().toLowerCase();
+                input.value = '';
+                
+                addOutput(`> ${command}`);
+                
+                if (commands[command]) {
+                    commands[command].execute();
+                } else if (command) {
+                    addOutput(`未知命令: ${command}`);
+                    addOutput('输入 "help" 获取命令列表');
+                }
+            }
+        });
+        
+        // 创建矩阵代码效果
+        function createMatrixEffect() {
+            const chars = "01";
+            const columns = Math.floor(window.innerWidth / 15);
+            const rows = Math.floor(window.innerHeight / 20);
+            
+            matrixCode.innerHTML = '';
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.top = `${-20 * rows}px`;
+                column.style.left = `${i * 15}px`;
+                column.style.width = '15px';
+                column.style.color = `rgba(0, 255, 0, ${Math.random() * 0.5 + 0.3})`;
+                column.style.fontSize = '16px';
+                column.style.fontFamily = 'monospace';
+                column.style.whiteSpace = 'pre';
+                column.style.textShadow = '0 0 5px #0f0';
+                
+                let text = '';
+                for (let j = 0; j < rows; j++) {
+                    text += chars[Math.floor(Math.random() * chars.length)] + '\n';
+                }
+                column.textContent = text;
+                
+                matrixCode.appendChild(column);
+                
+                animateColumn(column, rows);
+            }
+        }
+        
+        // 动画列
+        function animateColumn(column, rows) {
+            let position = -20 * rows;
+            const speed = Math.random() * 50 + 50;
+            
+            function move() {
+                position += 1;
+                column.style.top = `${position}px`;
+                
+                if (position > window.innerHeight) {
+                    position = -20 * rows;
+                    column.style.color = `rgba(0, 255, 0, ${Math.random() * 0.5 + 0.3})`;
+                }
+                
+                setTimeout(move, speed);
+            }
+            
+            move();
+        }
+        
+        // 初始化
+        window.addEventListener('load', () => {
+            createMatrixEffect();
+            input.focus();
+        });
+        
+        window.addEventListener('resize', createMatrixEffect);
+    </script>
+</body>
+</html>
